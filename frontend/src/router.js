@@ -7,6 +7,8 @@ import HospitalUserVue from "./components/User/HospitalUser.vue";
 import NavbarUserVue from "./components/User/NavbarUser.vue";
 import ListDoctorVue from "./components/User/ListDoctor.vue"
 import ListHospitalVue from "./components/User/ListHospital.vue"
+import RegistrationVue from "./components/RegistrationForm.vue"
+
 
 const routes = [
     {
@@ -36,6 +38,12 @@ const routes = [
             footer: FooterUserVue
         }
     },
+    {
+       path:"/registrationform" ,
+       components:{
+        default:RegistrationVue,
+       }
+    }
 ]
 const router = createRouter({
     history: createWebHistory(),
