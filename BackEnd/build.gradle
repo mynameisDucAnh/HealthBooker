@@ -18,13 +18,23 @@ repositories {
 }
 
 dependencies {
-    // https://mvnrepository.com/artifact/org.projectlombok/lombok
+    // Lombok for reducing boilerplate code
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    // Spring Boot Web Starter for building web applications
     implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    // Spring Boot Starter Validation for bean validation support
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Spring Boot Starter Test for testing Spring Boot applications
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // JUnit Platform Launcher for running tests
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.3'
 }
+
 
 tasks.named('test') {
     useJUnitPlatform()
