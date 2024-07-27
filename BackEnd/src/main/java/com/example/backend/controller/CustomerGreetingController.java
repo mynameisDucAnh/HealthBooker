@@ -1,7 +1,7 @@
 package com.example.backend.controller;
 
 import org.springframework.web.bind.annotation.*;
-import com.example.backend.model.Greeting;
+import com.example.backend.models.Greeting;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
