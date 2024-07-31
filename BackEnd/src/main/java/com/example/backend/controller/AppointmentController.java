@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("v1/appointments")
+@RequestMapping("${api.prefix}/appointments")
 public class AppointmentController {
     @PostMapping("/schedule")
     public ResponseEntity<?> scheduleAppointment(@RequestBody AppointmentDTO appointmentDTO) {

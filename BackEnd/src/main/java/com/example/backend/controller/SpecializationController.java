@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("v1/specializations")
+@RequestMapping("${api.prefix}/specializations")
 public class SpecializationController {
     @PostMapping("/add")
     public ResponseEntity<?> addSpecialization(@RequestBody SpecializationDTO specializationDTO) {

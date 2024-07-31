@@ -1,6 +1,8 @@
 package com.example.backend.models;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -10,34 +12,43 @@ import java.util.List;
 @Entity
 @Table(name = "doctors")
 @Data
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Doctor {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
-    private Integer userId;  // Bạn có thể thay đổi kiểu dữ liệu tùy vào cách định nghĩa của bạn
+    private Integer userId;
 
-    @Column(name = "specialization", length = 100)
+    @Column(name = "name", length = 100, nullable = false)
+    private String name;
+
+    @Column(name = "specialization", length = 100, nullable = false)
     private String specialization;
 
-    @Column(name = "qualification", length = 100)
+    @Column(name = "qualification", length = 100, nullable = false)
     private String qualification;
 
-    @Column(name = "experience_years")
     private Integer experienceYears;
 
-    @Column(name = "clinic_address", length = 200)
+    @Column(name = "clinic_address", length = 200, nullable = false)
     private String clinicAddress;
 
-    @Column(name = "created_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP", updatable = false)
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
-    @ManyToOne  // This sets up the many-to-one relationship with Hospital
-    @JoinColumn(name = "hospital_id")  // Assuming a hospital_id column exists
-    private Hospital hospital;  // This field should match the mappedBy value
 
-    @OneToMany(mappedBy = "doctor")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "hospital_id")
+    private Hospital hospital;
+
+    @OneToMany(mappedBy = "doctor", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ClinicHour> clinicHours;
+
+    @Column(name = "file")
+    private String file;
 }

@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("v1/patients")
+@RequestMapping("${api.prefix}/patients")
 public class PatientController {
     @PostMapping("/add")
     public ResponseEntity<?> addPatient(@RequestBody PatientDTO patientDTO) {

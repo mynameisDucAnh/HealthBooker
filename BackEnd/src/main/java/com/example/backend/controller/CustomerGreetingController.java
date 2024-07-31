@@ -5,7 +5,7 @@ import com.example.backend.models.Greeting;
 import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
-@RequestMapping("/v1")
+@RequestMapping("${api.prefix}")
 public class CustomerGreetingController {
 
     private static final String greetingTemplate = " Hello %s %s";

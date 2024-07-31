@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("v1/feedback")
+@RequestMapping("${api.prefix}/feedback")
 public class FeedbackController {
     @PostMapping("/submit")
     public ResponseEntity<?> submitFeedback(@RequestBody FeedbackDTO feedbackDTO) {

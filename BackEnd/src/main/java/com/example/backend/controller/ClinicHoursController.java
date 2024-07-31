@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("v1/clinic-hours")
+@RequestMapping("${api.prefix}/clinic-hours")
 public class ClinicHoursController {
     @PostMapping("/update")
     public ResponseEntity<?> updateClinicHours(@RequestBody ClinicHoursDTO clinicHoursDTO) {

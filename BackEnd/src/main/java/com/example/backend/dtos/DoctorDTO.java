@@ -2,6 +2,7 @@ package com.example.backend.dtos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @Data
 @Getter
@@ -11,6 +12,7 @@ import lombok.*;
 public class DoctorDTO {
     @JsonProperty("user_id")
     private Integer userId;
+    private String name;
     private String specialization;
     private String qualification;
     @JsonProperty("experience_years")
@@ -21,4 +23,6 @@ public class DoctorDTO {
     private String createdAt;
     @JsonProperty("updated_at")
     private String updatedAt;
+    @JsonProperty("file")
+    private String file;
 }

@@ -5,7 +5,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("v1/tokens")
+@RequestMapping("${api.prefix}/tokens")
 public class TokenController {
     @PostMapping("/generate")
     public ResponseEntity<?> generateToken(@RequestBody TokenDTO tokenDTO) {
