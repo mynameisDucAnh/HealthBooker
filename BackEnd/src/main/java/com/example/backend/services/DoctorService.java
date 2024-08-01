@@ -1,16 +1,13 @@
 package com.example.backend.services;
 
 import com.example.backend.dtos.DoctorDTO;
+import com.example.backend.exceptions.DataNotFoundException;
 import com.example.backend.models.Doctor;
-import com.example.backend.models.Hospital;
 import com.example.backend.repositories.DoctorRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -19,13 +16,14 @@ public class DoctorService implements IDoctorService {
     private final DoctorRepository doctorRepository;
 
     @Override
-    public Doctor createDoctor(DoctorDTO doctorDTO) {
+    public Doctor createDoctor(DoctorDTO doctorDTO) throws DataNotFoundException {
         if (doctorDTO.getUserId() == null) {
             throw new IllegalArgumentException("User ID must be provided.");
         }
 
+        // Create a new doctor without checking for existing doctor ID
         Doctor newDoctor = Doctor.builder()
-                .userId(doctorDTO.getUserId())  // Đảm bảo có giá trị cho userId
+                .userId(doctorDTO.getUserId())
                 .name(doctorDTO.getName())
                 .specialization(doctorDTO.getSpecialization())
                 .qualification(doctorDTO.getQualification())
@@ -38,14 +36,15 @@ public class DoctorService implements IDoctorService {
     }
 
     @Override
-    public Doctor getDoctorById(Integer id) {
-        Optional<Doctor> doctorOptional = doctorRepository.findById(id);
-        return doctorOptional.orElse(null);
+    public Doctor getDoctorById(Integer id) throws Exception{
+        return doctorRepository.findById(id).
+                orElseThrow(()->new DataNotFoundException(
+                        "Cannot find doctor with id = "+ id));
     }
 
     @Override
-    public List<Doctor> getAllDoctor() {
-        return doctorRepository.findAll();
+    public Page<Doctor> getAllDoctor(PageRequest pageRequest) {
+        return doctorRepository.findAll(pageRequest);
     }
 
     @Override
@@ -65,6 +64,4 @@ public class DoctorService implements IDoctorService {
         }
         doctorRepository.deleteById(id);
     }
-
-
 }

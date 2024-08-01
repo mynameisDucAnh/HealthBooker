@@ -1,28 +1,25 @@
 package com.example.backend.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.*;
-import org.springframework.web.multipart.MultipartFile;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Data
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class DoctorDTO {
-    @JsonProperty("user_id")
+
     private Integer userId;
     private String name;
     private String specialization;
     private String qualification;
-    @JsonProperty("experience_years")
     private Integer experienceYears;
-    @JsonProperty("clinic_address")
     private String clinicAddress;
-    @JsonProperty("created_at")
-    private String createdAt;
-    @JsonProperty("updated_at")
-    private String updatedAt;
-    @JsonProperty("file")
     private String file;
+
+    // Additional fields for creation if needed
+//    private String hospitalId;
+//    private List<String> clinicHours;
 }

@@ -26,7 +26,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class HospitalController {
     private final HospitalService hospitalService;
-    @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> createHospital(
             @RequestParam("name") String name,
             @RequestParam("description") String description,
