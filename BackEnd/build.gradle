@@ -38,6 +38,10 @@ dependencies {
 
     // MySQL JDBC Driver
     implementation 'mysql:mysql-connector-java:8.0.33'
+
+    // https://mvnrepository.com/artifact/javax.activation/javax.activation-api
+    implementation 'javax.activation:javax.activation-api:1.2.0'
+
 }
 
 tasks.named('test') {

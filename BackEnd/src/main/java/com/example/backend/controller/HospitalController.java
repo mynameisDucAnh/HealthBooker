@@ -1,15 +1,20 @@
 package com.example.backend.controller;
 
 import com.example.backend.dtos.HospitalDTO;
+import com.example.backend.dtos.HospitalImageDTO;
 import com.example.backend.models.Hospital;
-import com.example.backend.services.HospitalService;
+import com.example.backend.models.HospitalImage;
+import com.example.backend.services.IHospitalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,68 +23,115 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("${api.prefix}/hospital")
 @RequiredArgsConstructor
 public class HospitalController {
-    private final HospitalService hospitalService;
-    @PostMapping(value = "/create", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<String> createHospital(
-            @RequestParam("name") String name,
-            @RequestParam("description") String description,
-            @RequestParam("vote") int vote,
-            @RequestParam("file") MultipartFile file
+
+    private final IHospitalService hospitalService;
+
+    @PostMapping("")
+    public ResponseEntity<?> createHospital(
+            @Valid @ModelAttribute HospitalDTO hospitalDTO,
+            BindingResult result
     ) {
+        // Validate the input
+        if (result.hasErrors()) {
+            List<String> errorMessages = result.getFieldErrors()
+                    .stream()
+                    .map(FieldError::getDefaultMessage)
+                    .collect(Collectors.toList());
+            return ResponseEntity.badRequest().body(errorMessages);
+        }
+
         try {
-            String contentType = file.getContentType();
-            if (contentType == null || !contentType.startsWith("image/")) {
-                return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
-                        .body("File must be an image");
-            }
+            // Process hospital creation
+            Hospital newHospital = hospitalService.createHospital(hospitalDTO);
+            return ResponseEntity.ok(newHospital);
 
-            // Store the file
-            String storedFilename = storeFile(file);
-
-            // Construct HospitalDTO manually
-            HospitalDTO hospitalDTO = new HospitalDTO(name, description, vote, file);
-            hospitalService.createHospital(hospitalDTO);
-            return ResponseEntity.ok("Create hospital successfully " );
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.badRequest().body("Error");
+            return ResponseEntity.badRequest().body(Collections.singletonList("Error creating hospital"));
         }
     }
+
+    @PostMapping(value = "/upload/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> uploadImages(
+            @RequestParam("files") MultipartFile[] files,
+            @PathVariable("id") Integer id
+    ) {
+        try {
+            Hospital existingHospital = hospitalService.getHospitalById(id);
+
+            if (files == null || files.length == 0) {
+                return ResponseEntity.badRequest().body("No files provided");
+            }
+
+            List<HospitalImage> hospitalImages = new ArrayList<>();
+
+            for (MultipartFile file : files) {
+                if (file != null && !file.isEmpty()) {
+                    // Check file size
+                    if (file.getSize() > 10 * 1024 * 1024) {
+                        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                                .body(Collections.singletonList("File is too large! Maximum size is 10MB"));
+                    }
+                    // Check file type
+                    String contentType = file.getContentType();
+                    if (contentType == null || !contentType.startsWith("image/")) {
+                        return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
+                                .body(Collections.singletonList("File must be an image"));
+                    }
+                    // Store the file
+                    String filename = storeFile(file);
+
+                    HospitalImage hospitalImage = hospitalService.createHospitalImage(
+                            existingHospital.getId(),
+                            HospitalImageDTO.builder()
+                                    .imageUrl(filename)
+                                    .build()
+                    );
+                    hospitalImages.add(hospitalImage);
+                }
+            }
+
+            return ResponseEntity.ok(hospitalImages);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Collections.singletonList("Error storing files"));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest()
+                    .body(Collections.singletonList("Error processing images"));
+        }
+    }
+
     @GetMapping("")
     public ResponseEntity<List<Hospital>> getAllHospital(
             @RequestParam("page") int page,
             @RequestParam("limit") int limit
     ) {
-        List<Hospital> hospitalList = hospitalService.getAllHospital();
+        PageRequest pageRequest = PageRequest.of(page, limit);
+        Page<Hospital> hospitalPage = hospitalService.getAllHospital(pageRequest);
+        List<Hospital> hospitalList = hospitalPage.getContent();
         return ResponseEntity.ok(hospitalList);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<String> getHospitalById(@PathVariable("id") String hospitalId) {
-        return ResponseEntity.ok("Hospital with id " + hospitalId);
-    }
-
-
-    private String storeFile(MultipartFile file) throws IOException {
-        String filename = StringUtils.cleanPath(file.getOriginalFilename());
-        // Add UUID to filename to avoid collisions
-        String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
-        Path uploadDir = Paths.get("uploads");
-        if (!Files.exists(uploadDir)) {
-            Files.createDirectories(uploadDir);
+    public ResponseEntity<Hospital> getHospitalById(@PathVariable("id") int hospitalId) {
+        try {
+            Hospital hospital = hospitalService.getHospitalById(hospitalId);
+            return ResponseEntity.ok(hospital);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
         }
-        // Full path to the file
-        Path destination = uploadDir.resolve(uniqueFilename);
-        // Copy file to the destination directory
-        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
-        return uniqueFilename;
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -88,30 +140,26 @@ public class HospitalController {
             @RequestParam("name") String name,
             @RequestParam("description") String description,
             @RequestParam("vote") int vote,
-            @RequestParam(value = "file", required = false) MultipartFile file) {
+            @RequestParam(value = "file", required = false) MultipartFile file
+    ) {
         try {
-            // Find the existing hospital
             Hospital existingHospital = hospitalService.getHospitalById(id);
-
-            // Update the name, description, and vote
             existingHospital.setName(name);
             existingHospital.setDescription(description);
             existingHospital.setVote(vote);
 
-            // Check if a new file is provided
             if (file != null && !file.isEmpty()) {
                 String contentType = file.getContentType();
                 if (contentType != null && contentType.startsWith("image/")) {
-                    // Store the new file
                     String storedFilename = storeFile(file);
-                    existingHospital.setFile(storedFilename);
+                    // Handle storing file paths in your Hospital model if needed
+                    // existingHospital.setFile(storedFilename);
                 } else {
                     return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE)
                             .body("File must be an image");
                 }
             }
 
-            // Save the updated hospital
             hospitalService.updateHospital(existingHospital);
             return ResponseEntity.ok("Update hospital successfully");
         } catch (Exception e) {
@@ -120,10 +168,26 @@ public class HospitalController {
         }
     }
 
-
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteHospital(@PathVariable int id) {
-        hospitalService.deleteHospital(id);
-        return ResponseEntity.ok(String.format("Delete hospital with "+ id+"successfully"));
+        try {
+            hospitalService.deleteHospital(id);
+            return ResponseEntity.ok(String.format("Delete hospital with id %d successfully", id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(String.format("Hospital with id %d not found", id));
+        }
+    }
+
+    private String storeFile(MultipartFile file) throws IOException {
+        String filename = StringUtils.cleanPath(file.getOriginalFilename());
+        String uniqueFilename = UUID.randomUUID().toString() + "_" + filename;
+        Path uploadDir = Paths.get("uploads");
+        if (!Files.exists(uploadDir)) {
+            Files.createDirectories(uploadDir);
+        }
+        Path destination = uploadDir.resolve(uniqueFilename);
+        Files.copy(file.getInputStream(), destination, StandardCopyOption.REPLACE_EXISTING);
+        return uniqueFilename;
     }
 }

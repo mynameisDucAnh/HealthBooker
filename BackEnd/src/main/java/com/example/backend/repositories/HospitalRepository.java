@@ -9,4 +9,7 @@ import java.util.List;
 @Repository
 public interface HospitalRepository extends JpaRepository<Hospital, Integer> {
     List<Hospital> findHospitalById(Integer id);
+
+    List<Hospital> findById(Hospital hospital);
+
 }
