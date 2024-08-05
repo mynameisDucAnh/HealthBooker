@@ -8,7 +8,7 @@ import NavbarUserVue from "./components/User/NavbarUser.vue";
 import ListDoctorVue from "./components/User/ListDoctor.vue"
 import ListHospitalVue from "./components/User/ListHospital.vue"
 import RegistrationVue from "./components/RegistrationForm.vue"
-
+import HospitalForm from "./components/Admin/HospitalForm.vue"
 
 const routes = [
     {
@@ -43,6 +43,12 @@ const routes = [
        components:{
         default:RegistrationVue,
        }
+    },
+    {
+        path:"/admin/hospital",
+        components:{
+            default:HospitalForm,
+        }
     }
 ]
 const router = createRouter({

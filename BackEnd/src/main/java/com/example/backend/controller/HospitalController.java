@@ -30,6 +30,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping("${api.prefix}/hospital")
 @RequiredArgsConstructor
 public class HospitalController {

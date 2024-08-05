@@ -100,14 +100,9 @@
 
 <script>
 export default {
-  data:{
-    return:{
-      
-    }
-  }
+  
 };
 </script>
-
 <style scoped>
 #hospitalUser {
     padding: 65px 0;
