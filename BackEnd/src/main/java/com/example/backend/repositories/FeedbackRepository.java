@@ -9,6 +9,5 @@ import java.util.List;
 @Repository
 public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
     // Các phương thức truy vấn bổ sung nếu cần
-    List<Feedback> findByDoctor_UserId(Integer doctorUserId);
-    List<Feedback> findByPatient_User_Id(Integer userId);
+
 }

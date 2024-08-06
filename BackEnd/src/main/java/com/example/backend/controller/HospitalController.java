@@ -4,11 +4,14 @@ import com.example.backend.dtos.HospitalDTO;
 import com.example.backend.dtos.HospitalImageDTO;
 import com.example.backend.models.Hospital;
 import com.example.backend.models.HospitalImage;
+import com.example.backend.responses.HospitalListResponses;
+import com.example.backend.responses.HospitalResponses;
 import com.example.backend.services.IHospitalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -115,19 +118,24 @@ public class HospitalController {
     }
 
     @GetMapping("")
-    public ResponseEntity<List<Hospital>> getAllHospital(
+    public ResponseEntity<HospitalListResponses> getAllHospital(
             @RequestParam("page") int page,
             @RequestParam("limit") int limit
     ) {
         PageRequest pageRequest = PageRequest.of(page, limit);
-        Page<Hospital> hospitalPage = hospitalService.getAllHospital(pageRequest);
-        List<Hospital> hospitalList = hospitalPage.getContent();
-        return ResponseEntity.ok(hospitalList);
+        Page<HospitalResponses> hospitalPage = hospitalService.getAllHospital(pageRequest);
+        int totalPages = hospitalPage.getTotalPages();
+        List<HospitalResponses> hospitalList = hospitalPage.getContent();
+        return ResponseEntity.ok(HospitalListResponses.builder()
+                        .hospitalList(hospitalList)
+                        .totalPages(totalPages)
+                .build());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Hospital> getHospitalById(@PathVariable("id") int hospitalId) {
+    public ResponseEntity<?> getHospitalById(@PathVariable("id") int hospitalId) {
         try {
+
             Hospital hospital = hospitalService.getHospitalById(hospitalId);
             return ResponseEntity.ok(hospital);
         } catch (Exception e) {

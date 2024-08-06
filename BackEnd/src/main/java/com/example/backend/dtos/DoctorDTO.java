@@ -24,7 +24,7 @@ public class DoctorDTO {
 
     private String clinicAddress;
 
-    private String file;
+//    private String file;
 
     // Additional fields for creation if needed
 //    private String hospitalId;

@@ -18,11 +18,8 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot JPA Starter for interacting with databases
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
-    // Lombok for reducing boilerplate code
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.34'
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     // Spring Boot Web Starter for building web applications
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -30,18 +27,21 @@ dependencies {
     // Spring Boot Starter Validation for bean validation support
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 
+    // ModelMapper for object mapping
+    implementation 'org.modelmapper:modelmapper:3.1.1'
+
+    // MySQL JDBC Driver for connecting to MySQL databases
+    implementation 'mysql:mysql-connector-java:8.0.33'
+
+    // Lombok for reducing boilerplate code
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+
     // Spring Boot Starter Test for testing Spring Boot applications
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
     // JUnit Platform Launcher for running tests
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.9.3'
-
-    // MySQL JDBC Driver
-    implementation 'mysql:mysql-connector-java:8.0.33'
-
-    // https://mvnrepository.com/artifact/javax.activation/javax.activation-api
-    implementation 'javax.activation:javax.activation-api:1.2.0'
-
 }
 
 tasks.named('test') {

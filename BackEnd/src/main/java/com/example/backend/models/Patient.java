@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,12 +20,8 @@ import java.time.LocalDateTime;
 public class Patient {
 
     @Id
-    private Integer userId;  // Khóa chính user_id
-
-    @OneToOne
-    @MapsId
-    @JoinColumn(name = "user_id")
-    private User user;
+    @Column(name = "user_id")
+    private Integer userId;
 
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
@@ -37,9 +35,11 @@ public class Patient {
     @Column(name = "medical_history", columnDefinition = "TEXT")
     private String medicalHistory;
 
+    @CreationTimestamp
     @Column(name = "created_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
+    @UpdateTimestamp
     @Column(name = "updated_at", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 }

@@ -9,6 +9,6 @@ import java.util.List;
 @Repository
 public interface MedicalRecordRepository extends JpaRepository<MedicalRecord, Integer> {
     // Các phương thức truy vấn bổ sung nếu cần
-    List<MedicalRecord> findByPatient_User_Id(Integer userId);
-    List<MedicalRecord> findByDoctor_UserId(Integer doctorUserId);
+    List<MedicalRecord> findByPatientUserId(Integer userId);
+    List<MedicalRecord> findByDoctorUserId(Integer doctorUserId);
 }

@@ -10,8 +10,8 @@ import java.util.List;
 public interface AppointmentRepository extends JpaRepository<Appointment, Integer> {
 
     // Truy vấn theo ID của User liên kết với Patient
-    List<Appointment> findByPatient_User_Id(Integer userId);
+    List<Appointment> findByPatientUserId(Integer userId);
 
     // Truy vấn theo ID của Doctor
-    List<Appointment> findByDoctor_UserId(Integer doctorUserId);
+    List<Appointment> findByDoctorUserId(Integer doctorUserId);
 }

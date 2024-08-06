@@ -3,6 +3,9 @@ package com.example.backend.dtos;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 @Data
 @Getter
 @Setter
@@ -15,9 +18,9 @@ public class AppointmentDTO {
     @JsonProperty("doctor_id")
     private Integer doctorId;
     @JsonProperty("appointment_date")
-    private String appointmentDate;
+    private LocalDate appointmentDate;
     @JsonProperty("appointment_time")
-    private String appointmentTime;
+    private LocalTime appointmentTime;
     private String status;
     @JsonProperty("created_at")
     private String createdAt;

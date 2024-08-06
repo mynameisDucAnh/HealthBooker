@@ -4,6 +4,8 @@ import com.example.backend.dtos.DoctorDTO;
 import com.example.backend.exceptions.DataNotFoundException;
 import com.example.backend.models.Doctor;
 import com.example.backend.repositories.DoctorRepository;
+import com.example.backend.responses.DoctorResponses;
+import com.example.backend.responses.HospitalResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,7 +31,6 @@ public class DoctorService implements IDoctorService {
                 .qualification(doctorDTO.getQualification())
                 .experienceYears(doctorDTO.getExperienceYears())
                 .clinicAddress(doctorDTO.getClinicAddress())
-                .file(doctorDTO.getFile())
                 .build();
 
         return doctorRepository.save(newDoctor);
@@ -43,8 +44,24 @@ public class DoctorService implements IDoctorService {
     }
 
     @Override
-    public Page<Doctor> getAllDoctor(PageRequest pageRequest) {
-        return doctorRepository.findAll(pageRequest);
+    public Page<DoctorResponses> getAllDoctor(PageRequest pageRequest) {
+        // Fetch all doctors with pagination and map each Doctor entity to a DoctorResponses DTO
+        return doctorRepository.findAll(pageRequest).map(doctor -> {
+            // Create a new DoctorResponses builder and populate it with Doctor entity fields
+            DoctorResponses doctorResponses = DoctorResponses.builder()
+                    .name(doctor.getName()) // Ensure the correct field mapping
+                    .specialization(doctor.getSpecialization()) // Add necessary fields
+                    .qualification(doctor.getQualification())
+                    .experienceYears(doctor.getExperienceYears())
+                    .clinicAddress(doctor.getClinicAddress())
+                    .build();
+
+            // Set createdAt and updatedAt fields from Doctor entity
+            doctorResponses.setCreatedAt(doctor.getCreatedAt());
+            doctorResponses.setUpdatedAt(doctor.getUpdatedAt());
+
+            return doctorResponses;
+        });
     }
 
     @Override

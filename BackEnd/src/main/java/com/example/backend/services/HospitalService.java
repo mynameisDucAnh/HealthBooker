@@ -8,6 +8,7 @@ import com.example.backend.models.Hospital;
 import com.example.backend.models.HospitalImage;
 import com.example.backend.repositories.HospitalImageRepository;
 import com.example.backend.repositories.HospitalRepository;
+import com.example.backend.responses.HospitalResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -42,8 +43,17 @@ public class HospitalService implements IHospitalService {
     }
 
     @Override
-    public Page<Hospital> getAllHospital(PageRequest pageRequest) {
-        return hospitalRepository.findAll(pageRequest);
+    public Page<HospitalResponses> getAllHospital(PageRequest pageRequest) {
+        return hospitalRepository.findAll(pageRequest).map(hospital -> {
+            HospitalResponses hospitalResponses = HospitalResponses.builder()
+                    .name(hospital.getName())
+                    .description(hospital.getDescription())
+                    .vote(hospital.getVote())
+                    .build();
+            hospitalResponses.setCreatedAt(hospital.getCreatedAt());
+            hospitalResponses.setUpdatedAt(hospital.getUpdatedAt());
+            return hospitalResponses;
+        });
     }
 
     @Override
