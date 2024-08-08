@@ -27,6 +27,9 @@ public class AppointmentService implements IAppointmentService {
 
     @Override
     public AppointmentResponses createAppointment(AppointmentDTO appointmentDTO) throws DataNotFoundException {
+        // Debugging logs
+        System.out.println("Creating appointment with DTO: " + appointmentDTO);
+
         // Tìm kiếm bệnh nhân
         Patient patient = patientRepository.findById(appointmentDTO.getPatientId())
                 .orElseThrow(() -> new DataNotFoundException("Không tìm thấy bệnh nhân"));
@@ -41,7 +44,7 @@ public class AppointmentService implements IAppointmentService {
                 .doctor(doctor)
                 .appointmentDate(appointmentDTO.getAppointmentDate())
                 .appointmentTime(appointmentDTO.getAppointmentTime())
-                .status("scheduled")
+                .status(appointmentDTO.getStatus() != null ? appointmentDTO.getStatus() : "scheduled")
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
@@ -50,7 +53,6 @@ public class AppointmentService implements IAppointmentService {
         appointment = appointmentRepository.save(appointment);
         return modelMapper.map(appointment, AppointmentResponses.class);
     }
-
     @Override
     public AppointmentResponses getAppointment(Integer id) throws DataNotFoundException {
         // Tìm kiếm cuộc hẹn theo ID

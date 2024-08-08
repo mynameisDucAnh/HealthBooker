@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Integer> {
+
     // Phương thức truy vấn tùy chỉnh
     Role findByName(String name);
 }

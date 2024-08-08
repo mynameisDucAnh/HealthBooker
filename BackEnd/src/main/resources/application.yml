@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/healthBook
+    url: jdbc:mysql://localhost:3306/websiteHealthBook
     username: root
     password: 112233
   jpa:
@@ -22,3 +22,9 @@ spring:
 
 api:
   prefix: api/v1
+
+jwt:
+  expirationMs: 2592000 #30 days = 30*24*60*60
+  secret: 8qICZqQST7dv0aFih0oxEXvvzxtfg5eZ8AP326+Db70=
+
+

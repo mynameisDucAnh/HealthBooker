@@ -1,5 +1,6 @@
 package com.example.backend.services;
 
+import com.example.backend.component.JwtTokenUtil;
 import com.example.backend.dtos.UserDTO;
 import com.example.backend.exceptions.DataNotFoundException;
 import com.example.backend.models.Role;
@@ -8,10 +9,18 @@ import com.example.backend.repositories.RoleRepository;
 import com.example.backend.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
 
 import static java.lang.Integer.parseInt;
 
@@ -20,9 +29,11 @@ import static java.lang.Integer.parseInt;
 public class UserService implements IUserService {
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-
+    private final PasswordEncoder passwordEncoder;
+    private final JwtTokenUtil jwtTokenUtil;
+    private final AuthenticationManager authenticationManager;
     @Override
-    public User createUser(UserDTO userDTO) throws DataNotFoundException {
+    public User createUser(UserDTO userDTO) throws Exception {
         String phoneNumber = userDTO.getPhoneNumber();
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
             throw new DataIntegrityViolationException("Phone number already exists");
@@ -42,12 +53,12 @@ public class UserService implements IUserService {
 
         Role role = roleRepository.findById(userDTO.getRoleId())
                 .orElseThrow(() -> new DataNotFoundException("Role not found"));
-//        newUser.setRole(role);
+        newUser.setRole(role);
 
         if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0) {
             String password = userDTO.getPassword();
-            // String encodedPassword = passwordEncoder.encode(password);
-            // newUser.setPassword(encodedPassword);
+            String encodedPassword = passwordEncoder.encode(password);
+            newUser.setPassword(encodedPassword);
         }
 
         // Save the new user to the database
@@ -55,7 +66,26 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String login(String phoneNumber, String password) {
-        return null;
+    public String login(String phoneNumber, String password) throws Exception {
+        Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
+        if (optionalUser.isEmpty()) {
+            throw new DataNotFoundException("Invalid phoneNumber / password");
+        }
+        User existingUser = optionalUser.get();
+        if (existingUser.getFacebookAccountId() == 0 && existingUser.getGoogleAccountId() == 0) {
+            if (!passwordEncoder.matches(password, existingUser.getPassword())) {
+                throw new BadCredentialsException("WRONG PHONE NUMBER OR PASSWORD");
+            }
+        }
+
+        // Thực hiện xác thực
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                phoneNumber, password, existingUser.getAuthorities()
+        );
+        authenticationManager.authenticate(authenticationToken);
+
+        // Gọi generateToken với phoneNumber và role
+        // Đảm bảo rằng bạn truyền đúng user vào generateToken
+        return jwtTokenUtil.generateToken(existingUser);
     }
 }
