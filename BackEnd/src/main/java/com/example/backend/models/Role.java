@@ -19,4 +19,8 @@ public class Role {
 
     @Column(nullable = false, unique = true)
     private String name;
+
+    public static String ADMIN = "ADMIN";
+    public static String USER = "USER";
+    public static String DOCTOR = "DOCTOR";
 }

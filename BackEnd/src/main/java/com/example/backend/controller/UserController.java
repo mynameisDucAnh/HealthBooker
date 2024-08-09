@@ -1,5 +1,6 @@
 package com.example.backend.controller;
 
+import com.example.backend.dtos.LoginResponseDTO;
 import com.example.backend.dtos.UserDTO;
 import com.example.backend.dtos.UserLoginDTO;
 import com.example.backend.models.User;
@@ -47,8 +48,8 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody UserLoginDTO userLoginDTO,
-                                        BindingResult result) {
+    public ResponseEntity<?> login(@Valid @RequestBody UserLoginDTO userLoginDTO,
+                                   BindingResult result) {
         if (result.hasErrors()) {
             // Trả về lỗi nếu có
             List<String> errorMessages = result.getFieldErrors()
@@ -59,8 +60,8 @@ public class UserController {
         }
 
         try {
-            String token = userService.login(userLoginDTO.getPhoneNumber(), userLoginDTO.getPassword());
-            return ResponseEntity.ok(token);
+            LoginResponseDTO response = userService.login(userLoginDTO.getPhoneNumber(), userLoginDTO.getPassword());
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

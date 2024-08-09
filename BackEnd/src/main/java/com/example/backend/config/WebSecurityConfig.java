@@ -1,6 +1,7 @@
 package com.example.backend.config;
 
 import com.example.backend.filters.JwtTokenFilter;
+import com.example.backend.models.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,6 +11,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static org.springframework.http.HttpMethod.POST;
 
 @Configuration
 @EnableMethodSecurity
@@ -24,8 +27,12 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/v1/users/register", "/api/v1/users/login")
                         .permitAll()
-                        .requestMatchers("/api/v1/appointments/create")
-                        .hasRole("ADMIN") // Phân quyền chính xác, không có tiền tố ROLE_
+                        .requestMatchers("/api/v1/appointments/**")
+                        .hasAnyRole(Role.ADMIN , Role.USER , Role.DOCTOR)
+                        .requestMatchers("/api/v1/doctors/**")
+                        .hasAnyRole(Role.ADMIN, Role.USER )
+                        .requestMatchers("/api/v1/hospitals/**")
+                        .hasAnyRole(Role.ADMIN)
                         .anyRequest()
                         .authenticated()
                 )

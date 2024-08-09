@@ -50,9 +50,9 @@
           </div>
         </div>
 
-        <div class="course-list">
+        <div  class="course-list">
           <!-- Course item 1 -->
-          <div class="course-item">
+          <div v-for="(doctor , index) in doctors"  :key="index" class="course-item">
             <a href="#!">
               <img
                 src="../../assets/img/41.-Phan-Văn-Chí-scaled.jpg"
@@ -64,16 +64,16 @@
               <div class="head">
                 <h3 class="title">
                   <a href="#!" class="line-clamp break-all">
-                    PGS. TS. BS Lâm Việt Trung
+                    {{doctor.name}} 
                   </a>
                 </h3>
                 <div class="rating">
                   <img src="../../assets/icons/star.svg" alt="Star" class="star" />
-                  <span class="value">4.5</span>
+                  <span class="value">{{doctor.experienceYears}}</span>
                 </div>
               </div>
               <p class="desc line-clamp line-2 break-all">
-                Bệnh viện đa khoa TP Đà Nẵng
+                 {{doctor.specialization}}
               </p>
               <div class="foot">
                 <button class="btn book-btn">Đặt lịch khám</button>
@@ -82,7 +82,7 @@
           </div>
 
           <!-- Course item 2 -->
-          <div class="course-item">
+          <!-- <div class="course-item">
             <a href="#!">
               <img
                 src="../../assets/img/Anh-bac-si-nu-1-min.jpg"
@@ -109,10 +109,10 @@
                 <button class="btn book-btn">Đặt lịch khám</button>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <!-- Course item 3 -->
-          <div class="course-item">
+          <!-- <div class="course-item">
             <a href="#!">
               <img
                 src="../../assets/img/Anh-bac-si-nam-8-min.jpg"
@@ -139,35 +139,8 @@
                 <button class="btn book-btn">Đặt lịch khám</button>
               </div>
             </div>
-          </div>
-          <div class="course-item">
-            <a href="#!">
-              <img
-                src="../../assets/img/41.-Phan-Văn-Chí-scaled.jpg"
-                alt="Basic web design"
-                class="thumb"
-              />
-            </a>
-            <div class="info">
-              <div class="head">
-                <h3 class="title">
-                  <a href="#!" class="line-clamp break-all">
-                    PGS. TS. BS Lâm Việt Trung
-                  </a>
-                </h3>
-                <div class="rating">
-                  <img src="../../assets/icons/star.svg" alt="Star" class="star" />
-                  <span class="value">4.5</span>
-                </div>
-              </div>
-              <p class="desc line-clamp line-2 break-all">
-                Bệnh viện đa khoa TP Đà Nẵng
-              </p>
-              <div class="foot">
-                <button class="btn book-btn">Đặt lịch khám</button>
-              </div>
-            </div>
-          </div>
+          </div> -->
+          
         </div>
       </div>
     </div>
@@ -175,7 +148,23 @@
 </template>
 
 <script>
-export default {};
+import { getDoctors } from '../../api/doctorService';
+export default {
+  data() {
+    return {
+      doctors: [],
+    };
+  },
+  async mounted() {
+    try {
+      const response = await getDoctors();
+      this.doctors = response.data.doctorList;
+    } catch (error) {
+      console.error('Error fetching doctors:', error);
+    }
+  },
+
+};
 </script>
 
 <style>

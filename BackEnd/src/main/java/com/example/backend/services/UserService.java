@@ -1,8 +1,10 @@
 package com.example.backend.services;
 
 import com.example.backend.component.JwtTokenUtil;
+import com.example.backend.dtos.LoginResponseDTO;
 import com.example.backend.dtos.UserDTO;
 import com.example.backend.exceptions.DataNotFoundException;
+import com.example.backend.exceptions.PermissionDenyException;
 import com.example.backend.models.Role;
 import com.example.backend.models.User;
 import com.example.backend.repositories.RoleRepository;
@@ -38,7 +40,12 @@ public class UserService implements IUserService {
         if (userRepository.existsByPhoneNumber(phoneNumber)) {
             throw new DataIntegrityViolationException("Phone number already exists");
         }
+        Role role = roleRepository.findById(userDTO.getRoleId())
+                .orElseThrow(() -> new DataNotFoundException("Role not found"));
 
+        if(role.getName().toUpperCase().equals(Role.ADMIN)){
+            throw new PermissionDenyException("You cannot register a admin account");
+        }
         // Map DTO fields to User entity
         User newUser = User.builder()
                 .fullName(userDTO.getFullName())
@@ -51,8 +58,7 @@ public class UserService implements IUserService {
                 .isActive(true) // Set isActive to true
                 .build();
 
-        Role role = roleRepository.findById(userDTO.getRoleId())
-                .orElseThrow(() -> new DataNotFoundException("Role not found"));
+
         newUser.setRole(role);
 
         if (userDTO.getFacebookAccountId() == 0 && userDTO.getGoogleAccountId() == 0) {
@@ -66,14 +72,14 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public String login(String phoneNumber, String password) throws Exception {
+    public LoginResponseDTO login(String phoneNumber, String password) throws Exception {
         Optional<User> optionalUser = userRepository.findByPhoneNumber(phoneNumber);
         if (optionalUser.isEmpty()) {
             throw new DataNotFoundException("Invalid phoneNumber / password");
         }
         User existingUser = optionalUser.get();
         if (existingUser.getFacebookAccountId() == 0 && existingUser.getGoogleAccountId() == 0) {
-            if (!passwordEncoder.matches(password, existingUser.getPassword())) {
+            if ((!passwordEncoder.matches(password, existingUser.getPassword()))) {
                 throw new BadCredentialsException("WRONG PHONE NUMBER OR PASSWORD");
             }
         }
@@ -84,8 +90,10 @@ public class UserService implements IUserService {
         );
         authenticationManager.authenticate(authenticationToken);
 
-        // Gọi generateToken với phoneNumber và role
-        // Đảm bảo rằng bạn truyền đúng user vào generateToken
-        return jwtTokenUtil.generateToken(existingUser);
+        // Generate token
+        String token = jwtTokenUtil.generateToken(existingUser);
+
+        // Return LoginResponseDTO with token and fullName
+        return new LoginResponseDTO(token, existingUser.getFullName());
     }
 }

@@ -1,110 +1,201 @@
 <template>
-<div id="registration">
-
-  <div class="container">
-    <input type="checkbox" id="flip">
-    <div class="cover">
-      <div class="front">
-        <img src="../assets/img/anhNenLogin.jpeg" alt="">
-        <div class="text">
-          
+  <div id="registration">
+    <div class="container">
+      <input type="checkbox" id="flip" />
+      <div class="cover">
+        <div class="front">
+          <img src="../assets/img/anhNenLogin.jpeg" alt="" />
+          <div class="text">
+            <!-- Nội dung khác -->
+          </div>
+        </div>
+        <div class="back">
+          <img src="../assets/img/anhNenLogin.jpeg" alt="" />
+          <div class="text">
+            <!-- Nội dung khác -->
+          </div>
         </div>
       </div>
-      <div class="back">
-               <img src="../assets/img/anhNenLogin.jpeg" alt="">
-        <div class="text">
-          
-        </div>
-      </div>
-    </div>
-    <div class="forms">
+      <div class="forms">
         <div class="form-content">
           <div class="login-form">
-            <div class="title">Login</div>
-          <form action="#">
-            <div class="input-boxes">
-              <div class="input-box">
-                <i class="fas fa-envelope"></i>
-                <input type="text" placeholder="Enter your email" required>
+            <div class="title">Đăng nhập</div>
+            <form @submit.prevent="handleLogin">
+              <div class="input-boxes">
+                <div class="input-box">
+                  <i class="fas fa-envelope"></i>
+                  <input
+                    type="text"
+                    v-model="login.phoneNumber"
+                    placeholder="Enter your phone number"
+                    required
+                  />
+                </div>
+                <div class="input-box">
+                  <i class="fas fa-lock"></i>
+                  <input
+                    type="password"
+                    v-model="login.password"
+                    placeholder="Enter your password"
+                    required
+                  />
+                </div>
+                <div class="text"><a href="#">Forgot password?</a></div>
+                <div class="button input-box">
+                  <input type="submit" value="Submit" />
+                </div>
+                <div class="text sign-up-text">
+                  Bạn chưa có tài khoản <label for="flip">Đăng ký ngay</label>
+                </div>
               </div>
-              <div class="input-box">
-                <i class="fas fa-lock"></i>
-                <input type="password" placeholder="Enter your password" required>
-              </div>
-              <div class="text"><a href="#">Forgot password?</a></div>
-              <div class="button input-box">
-                <input type="submit" value="Sumbit">
-              </div>
-              <div class="text sign-up-text">Don't have an account? <label for="flip">Sigup now</label></div>
-            </div>
-        </form>
-      </div>
-        <div class="signup-form">
-          <div class="title">Signup</div>
-        <form action="#">
-            <div class="input-boxes">
+            </form>
+          </div>
+          <div class="signup-form">
+            <div class="title">Đăng ký</div>
+            <form @submit.prevent="handleSignup">
               <div class="input-box">
                 <i class="fas fa-user"></i>
-                <input type="text" placeholder="Enter your name" required>
+                <input
+                  type="text"
+                  v-model="signup.fullName"
+                  placeholder="Enter your name"
+                  required
+                />
               </div>
               <div class="input-box">
                 <i class="fas fa-envelope"></i>
-                <input type="text" placeholder="Enter your email" required>
+                <input
+                  type="text"
+                  v-model="signup.phoneNumber"
+                  placeholder="Enter your phone number"
+                  required
+                />
+              </div>
+              <div class="input-box">
+                <i class="fas fa-home"></i>
+                <input
+                  type="text"
+                  v-model="signup.address"
+                  placeholder="Enter your address"
+                  required
+                />
               </div>
               <div class="input-box">
                 <i class="fas fa-lock"></i>
-                <input type="password" placeholder="Enter your password" required>
+                <input
+                  type="password"
+                  v-model="signup.password"
+                  placeholder="Enter your password"
+                  required
+                />
+              </div>
+              <div class="input-box">
+                <i class="fas fa-lock"></i>
+                <input
+                  type="password"
+                  v-model="signup.retypePassword"
+                  placeholder="Retype your password"
+                  required
+                />
+              </div>
+              <div class="input-box">
+                <i class="fas fa-calendar"></i>
+                <input
+                  type="date"
+                  v-model="signup.dateOfBirth"
+                  placeholder="Enter your date of birth"
+                  required
+                />
               </div>
               <div class="button input-box">
-                <input type="submit" value="Sumbit">
+                <input type="submit" value="Submit" />
               </div>
-              <div class="text sign-up-text">Already have an account? <label for="flip">Login now</label></div>
-            </div>
-      </form>
-    </div>
-    </div>
+              <div class="text sign-up-text">Bạn đã có tài khoản ? <label for="flip">Đăng nhập ngay</label></div>
+            </form>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-</div>
 </template>
-
 <script>
+import axios from "axios";
+import { API_BASE_URL } from "../api/apiConfig";
+import { mapActions } from "vuex";
+
 export default {
   data() {
     return {
       login: {
-        email: '',
-        password: ''
+        phoneNumber: "",
+        password: "",
       },
       signup: {
-        name: '',
-        email: '',
-        password: ''
-      }
+        fullName: "",
+        phoneNumber: "",
+        address: "",
+        dateOfBirth: "",
+        password: "",
+        retypePassword: "",
+        facebookAccountId: 0,
+        googleAccountId: 0,
+        roleId: 2, // Mặc định là 2
+      },
     };
   },
   methods: {
-    handleLogin() {
-      // Xử lý đăng nhập tại đây
-      console.log('Login:', this.login);
+    ...mapActions({
+      loginUser: "login", // Đặt tên hành động rõ ràng để tránh xung đột
+    }),
+    async handleLogin() {
+      try {
+        // Gọi hành động login từ Vuex
+        await this.loginUser({
+          phoneNumber: this.login.phoneNumber,
+          password: this.login.password,
+        });
+        this.$router.push("/"); // Chuyển hướng sau khi đăng nhập thành công
+      } catch (error) {
+        console.error("Login failed:", error.response?.data || error.message);
+      }
     },
-    handleSignup() {
-      // Xử lý đăng ký tại đây
-      console.log('Signup:', this.signup);
-    }
-  }
+    async handleSignup() {
+      if (this.signup.password !== this.signup.retypePassword) {
+        alert("Passwords do not match");
+        return;
+      }
+
+      try {
+        const response = await axios.post(`${API_BASE_URL}/users/register`, {
+          fullName: this.signup.fullName,
+          phoneNumber: this.signup.phoneNumber,
+          address: this.signup.address,
+          password: this.signup.password,
+          retypePassword: this.signup.retypePassword,
+          dateOfBirth: this.signup.dateOfBirth,
+          facebookAccountId: 0,
+          googleAccountId: 0,
+          roleId: 2,
+        });
+        alert("Signup successful!");
+        console.log("Signup response:", response.data);
+      } catch (error) {
+        alert("Signup failed: " + error.response.data);
+      }
+    },
+  },
 };
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
-*{
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap");
+* {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Poppins" , sans-serif;
+  font-family: "Poppins", sans-serif;
 }
-#registration{
+#registration {
   min-height: 100vh;
   display: flex;
   align-items: center;
@@ -113,16 +204,16 @@ export default {
   background-image: url();
   padding: 30px;
 }
-.container{
+.container {
   position: relative;
   max-width: 850px;
   width: 100%;
   background: #fff;
   padding: 40px 30px;
-  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
   perspective: 2700px;
 }
-.container .cover{
+.container .cover {
   position: absolute;
   top: 0;
   left: 50%;
@@ -133,24 +224,24 @@ export default {
   transform-origin: left;
   transform-style: preserve-3d;
 }
-.container #flip:checked ~ .cover{
+.container #flip:checked ~ .cover {
   transform: rotateY(-180deg);
 }
- .container .cover .front,
- .container .cover .back{
+.container .cover .front,
+.container .cover .back {
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
   width: 100%;
 }
-.cover .back{
+.cover .back {
   transform: rotateY(180deg);
   backface-visibility: hidden;
 }
 .container .cover::before,
-.container .cover::after{
-  content: '';
+.container .cover::after {
+  content: "";
   position: absolute;
   height: 100%;
   width: 100%;
@@ -159,12 +250,12 @@ export default {
   left: 0;
   z-index: 12;
 }
-.container .cover::after{
+.container .cover::after {
   opacity: 0.3;
   transform: rotateY(180deg);
   backface-visibility: hidden;
 }
-.container .cover img{
+.container .cover img {
   position: absolute;
   height: 100%;
   width: 100%;
@@ -172,7 +263,7 @@ export default {
   left: 0;
   z-index: 10;
 }
-.container .cover .text{
+.container .cover .text {
   position: absolute;
   z-index: 130;
   height: 100%;
@@ -183,38 +274,38 @@ export default {
   justify-content: center;
 }
 .cover .text .text-1,
-.cover .text .text-2{
+.cover .text .text-2 {
   font-size: 26px;
   font-weight: 600;
   color: #fff;
   text-align: center;
 }
-.cover .text .text-2{
+.cover .text .text-2 {
   font-size: 15px;
   font-weight: 500;
 }
-.container .forms{
+.container .forms {
   height: 100%;
   width: 100%;
   background: #fff;
 }
-.container .form-content{
+.container .form-content {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 .form-content .login-form,
-.form-content .signup-form{
+.form-content .signup-form {
   width: calc(100% / 2 - 25px);
 }
-.forms .form-content .title{
+.forms .form-content .title {
   position: relative;
   font-size: 24px;
   font-weight: 500;
   color: #333;
 }
-.forms .form-content .title:before{
-  content: '';
+.forms .form-content .title:before {
+  content: "";
   position: absolute;
   left: 0;
   bottom: 0;
@@ -222,13 +313,13 @@ export default {
   width: 25px;
   background: #7d2ae8;
 }
-.forms .signup-form  .title:before{
+.forms .signup-form .title:before {
   width: 20px;
 }
-.forms .form-content .input-boxes{
+.forms .form-content .input-boxes {
   margin-top: 30px;
 }
-.forms .form-content .input-box{
+.forms .form-content .input-box {
   display: flex;
   align-items: center;
   height: 50px;
@@ -236,7 +327,7 @@ export default {
   margin: 10px 0;
   position: relative;
 }
-.form-content .input-box input{
+.form-content .input-box input {
   height: 100%;
   width: 100%;
   outline: none;
@@ -244,34 +335,34 @@ export default {
   padding: 0 30px;
   font-size: 16px;
   font-weight: 500;
-  border-bottom: 2px solid rgba(0,0,0,0.2);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.2);
   transition: all 0.3s ease;
 }
 .form-content .input-box input:focus,
-.form-content .input-box input:valid{
+.form-content .input-box input:valid {
   border-color: #7d2ae8;
 }
-.form-content .input-box i{
+.form-content .input-box i {
   position: absolute;
   color: #7d2ae8;
   font-size: 17px;
 }
-.forms .form-content .text{
+.forms .form-content .text {
   font-size: 14px;
   font-weight: 500;
   color: #333;
 }
-.forms .form-content .text a{
+.forms .form-content .text a {
   text-decoration: none;
 }
-.forms .form-content .text a:hover{
+.forms .form-content .text a:hover {
   text-decoration: underline;
 }
-.forms .form-content .button{
+.forms .form-content .button {
   color: #fff;
   margin-top: 40px;
 }
-.forms .form-content .button input{
+.forms .form-content .button input {
   color: #fff;
   background: #7d2ae8;
   border-radius: 6px;
@@ -279,39 +370,39 @@ export default {
   cursor: pointer;
   transition: all 0.4s ease;
 }
-.forms .form-content .button input:hover{
+.forms .form-content .button input:hover {
   background: #5b13b9;
 }
-.forms .form-content label{
-  color: #5b13b9;
+.forms .form-content label {
+  color: #7d2ae8;
   cursor: pointer;
 }
-.forms .form-content label:hover{
+.forms .form-content label:hover {
   text-decoration: underline;
 }
-.forms .form-content .login-text,
-.forms .form-content .sign-up-text{
+.forms .form-content .sign-up-text {
   text-align: center;
-  margin-top: 25px;
+  margin-top: 30px;
 }
-.container #flip{
+.container #flip {
   display: none;
 }
+
 @media (max-width: 730px) {
-  .container .cover{
+  .container .cover {
     display: none;
   }
   .form-content .login-form,
-  .form-content .signup-form{
+  .form-content .signup-form {
     width: 100%;
   }
-  .form-content .signup-form{
+  .form-content .signup-form {
     display: none;
   }
-  .container #flip:checked ~ .forms .signup-form{
+  .container #flip:checked ~ .forms .signup-form {
     display: block;
   }
-  .container #flip:checked ~ .forms .login-form{
+  .container #flip:checked ~ .forms .login-form {
     display: none;
   }
 }
