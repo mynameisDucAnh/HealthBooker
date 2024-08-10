@@ -12,7 +12,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableMethodSecurity
@@ -27,11 +27,23 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(requests -> requests
                         .requestMatchers("/api/v1/users/register", "/api/v1/users/login")
                         .permitAll()
+                        .requestMatchers(GET,"/api/v1/doctors/**")
+                        .permitAll()
+                        .requestMatchers(GET,"/api/v1/hospitals/**")
+                        .permitAll()
                         .requestMatchers("/api/v1/appointments/**")
                         .hasAnyRole(Role.ADMIN , Role.USER , Role.DOCTOR)
-                        .requestMatchers("/api/v1/doctors/**")
-                        .hasAnyRole(Role.ADMIN, Role.USER )
-                        .requestMatchers("/api/v1/hospitals/**")
+                        .requestMatchers(POST,"/api/v1/doctors/**")
+                        .hasAnyRole(Role.ADMIN)
+                        .requestMatchers(GET,"/api/v1/doctors?")
+                        .hasAnyRole(Role.ADMIN)
+                        .requestMatchers(DELETE,"/api/v1/doctors/**")
+                        .hasAnyRole(Role.ADMIN)
+                        .requestMatchers(POST,"/api/v1/hospitals/**")
+                        .hasAnyRole(Role.ADMIN)
+                        .requestMatchers(GET,"/api/v1/hospitals?")
+                        .hasAnyRole(Role.ADMIN)
+                        .requestMatchers(DELETE,"/api/v1/hospitals/**")
                         .hasAnyRole(Role.ADMIN)
                         .anyRequest()
                         .authenticated()

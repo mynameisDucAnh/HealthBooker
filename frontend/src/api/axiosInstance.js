@@ -1,8 +1,8 @@
 import axios from 'axios';
-import store from '../store/index.js'; // Đường dẫn đến file store của bạn
+import store from '../store/index.js'; 
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8081/api/v1', // Your API base URL
+  baseURL: 'http://localhost:8081/api/v1', 
   __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: 'false',
   headers: {
     Accept: 'application/json',
@@ -10,7 +10,7 @@ const axiosInstance = axios.create({
   },
 });
 
-// Thêm interceptor để thêm token vào header Authorization
+
 axiosInstance.interceptors.request.use(
   (config) => {
     const token = store.state.authToken;
