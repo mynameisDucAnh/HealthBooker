@@ -7,13 +7,13 @@
           <p class="desc">Các cở sở được đặt hầu hết mọi nơi trong cả nước</p>
         </div>
         <div class="controls">
-          <a href="./hospital.html">Xem thêm</a>
+          <a href="./hospital.html"> Xem thêm</a>
         </div>
       </div>
 
-      <div class="course-list">
+      <div  class="course-list">
         <!-- Course item 1 -->
-        <div class="course-item">
+        <div v-for="(hospital,index) in hospitals" :key="index" class="course-item">
           <a href="#!">
             <img
               src="../../assets/img/benhvien1.jpg"
@@ -25,12 +25,12 @@
             <div class="head">
               <h3 class="title">
                 <a href="#!" class="line-clamp break-all">
-                  Bệnh viện Nhi TP Đà Nẵng
+                  {{hospital.name}}
                 </a>
               </h3>
               <div class="rating">
                 <img src="../../assets/icons/star.svg" alt="Star" class="star" />
-                <span class="value">4.5</span>
+                <span class="value">{{hospital.vote}}</span>
               </div>
             </div>
             <div class="foot">
@@ -40,7 +40,7 @@
         </div>
 
         <!-- Course item 2 -->
-        <div class="course-item">
+        <!-- <div class="course-item">
           <a href="#!">
             <img
               src="../../assets/img/benhvien2.jpg"
@@ -64,10 +64,10 @@
               <button class="btn book-btn">Đặt lịch khám</button>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Course item 3 -->
-        <div class="course-item">
+        <!-- <div class="course-item">
           <a href="#!">
             <img
               src="../../assets/img/benhvien3.jpg"
@@ -92,14 +92,29 @@
               <button class="btn book-btn">Đặt lịch khám</button>
             </div>
           </div>
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import {getHospitals} from "../../api/hospitalService"
 export default {
+  data(){
+    return{
+      hospitals:[]
+    }
+  },
+    async mounted(){
+      try {
+        const response = await getHospitals();
+        console.log(response);
+        this.hospitals = response.data.hospitalList;
+      } catch (error) {
+        console.error("ERROR");
+      }
+    }
   
 };
 </script>
@@ -151,7 +166,7 @@ export default {
     display: flex;
     gap: 30px;
     margin-top: 55px;
-
+    flex-direction: row;
     overflow-x: auto; /* Thêm overflow-x: auto để hiển thị thanh cuộn ngang */
     white-space: nowrap; /* Ngăn các course-item xuống dòng */
     -webkit-overflow-scrolling: touch; /* Cho phép cuộn trên các thiết bị cảm ứng */
@@ -174,11 +189,11 @@ export default {
 }
 
 #hospitalUser .course-item {
-    flex: 1;
     background: #ffffff;
     border: 1px solid #e2dfda;
     border-radius: 12px;
     min-width: 320px;
+    width: 320px;
 }
 
 #hospitalUser .course-item:hover {

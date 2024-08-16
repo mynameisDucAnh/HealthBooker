@@ -33,7 +33,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:8080")
 @RequestMapping("${api.prefix}/hospital")
 @RequiredArgsConstructor
 public class HospitalController {
@@ -126,10 +125,12 @@ public class HospitalController {
         Page<HospitalResponses> hospitalPage = hospitalService.getAllHospital(pageRequest);
         int totalPages = hospitalPage.getTotalPages();
         List<HospitalResponses> hospitalList = hospitalPage.getContent();
-        return ResponseEntity.ok(HospitalListResponses.builder()
-                        .hospitalList(hospitalList)
-                        .totalPages(totalPages)
-                .build());
+        HospitalListResponses responses = HospitalListResponses
+                .builder()
+                .hospitalList(hospitalList)
+                .totalPages(totalPages)
+                .build();
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/{id}")

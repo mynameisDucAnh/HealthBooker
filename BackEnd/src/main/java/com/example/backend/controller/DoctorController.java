@@ -7,6 +7,7 @@ import com.example.backend.responses.DoctorResponses;
 import com.example.backend.services.IDoctorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
@@ -187,6 +188,23 @@ public class DoctorController {
         } catch (Exception e) {
             e.printStackTrace();
             return ResponseEntity.badRequest().body("Error updating doctor");
+        }
+    }
+
+    @GetMapping("/img/{imgName}")
+    public ResponseEntity<?> viewImg(@PathVariable String imgName){
+        try{
+            java.nio.file.Path imgPath = Paths.get("uploads/" + imgName);
+            UrlResource resource = new UrlResource(imgPath.toUri());
+            if(resource.exists()){
+                return ResponseEntity.ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(resource);
+            }else{
+                return ResponseEntity.notFound().build();
+            }
+        }catch(Exception e){
+            return ResponseEntity.notFound().build();
         }
     }
 

@@ -33,7 +33,13 @@
 
 <script>
 export default {
-
+    data(){
+        return{
+            doctors:[]
+        }
+        
+    },
+    
 }
 </script>
 
